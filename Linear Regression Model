@@ -1,0 +1,123 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Importing Libraries
+
+# In[14]:
+
+
+import pandas as pd
+import numpy as np  
+import matplotlib.pyplot as plt  
+get_ipython().run_line_magic('matplotlib', 'inline')
+
+
+# # Importing the Data
+
+# In[15]:
+
+
+url = "http://bit.ly/w-data"
+s_data = pd.read_csv(url)
+s_data.head(10)
+
+
+# # Plotting the distribution of scores
+
+# In[16]:
+
+
+s_data.plot(x='Hours', y='Scores', style='o')  
+plt.title('Hours vs Percentage')  
+plt.xlabel('Hours Studied')  
+plt.ylabel('Percentage Score')  
+plt.show()
+
+
+# # Preparing the Data
+
+# In[17]:
+
+
+x = s_data.iloc[:, :-1].values  
+y = s_data.iloc[:, 1].values
+
+
+# In[18]:
+
+
+from sklearn.model_selection import train_test_split
+train_x,test_x,train_y,test_y = train_test_split(x,y, test_size = 0.2, random_state = 56)
+
+
+# # Implementing Linear Regression
+
+# # Training the Algorithm
+
+# In[19]:
+
+
+from sklearn.linear_model import LinearRegression as LR
+from sklearn.metrics import mean_absolute_error as mae
+
+
+# In[20]:
+
+
+lr = LR()
+lr.fit(train_x, train_y)
+
+
+# # Plotting the Regression Line and Test Data
+
+# In[21]:
+
+
+line = lr.coef_*x+lr.intercept_
+plt.scatter(x, y)
+plt.plot(x, line);
+plt.show()
+
+
+# # Making Predictions
+
+# In[22]:
+
+
+train_predict = lr.predict(train_x)
+k = mae(train_predict, train_y)
+print('Training Mean Absolute Error', k )
+
+
+# In[23]:
+
+
+test_predict = lr.predict(test_x)
+k = mae(test_predict, test_y)
+print('Test Mean Absolute Error', k )
+
+
+# In[24]:
+
+
+print(test_x) # Testing data - In Hours
+pred_y = lr.predict(test_x) # Predicting the scores
+
+
+# In[25]:
+
+
+residuals = pd.DataFrame({
+    'fitted values' : test_y,
+    'predicted values' : pred_y,
+})
+
+residuals['residuals'] = residuals['fitted values'] - residuals['predicted values']
+residuals.head()
+
+
+# In[26]:
+
+
+from sklearn import metrics  
+print('Mean Absolute Error:', metrics.mean_absolute_error(test_y, pred_y)) 
